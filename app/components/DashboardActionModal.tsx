@@ -1,7 +1,7 @@
 'use client';
-import { useState } from 'react';
-import ManageCampaignsModal from '../ManageCampaignsModal';
-import MyCampaignsModal from '../MyCampaignsModal';
+import React, { useState } from 'react';
+import ManageCampaignsModal from './ManageCampaignsModal';
+import MyCampaignsModal from './MyCampaignsModal';
 export type DashboardAction =
   | 'create-campaign'
   | 'manage-campaigns'
@@ -40,9 +40,9 @@ interface BrandCampaign {
 }
 interface BrandTransaction {
   id: string;
-  type: string;
+  type: 'deposit' | 'withdrawal' | 'payment';
   amount: number;
-  status: string;
+  status: 'pending' | 'completed' | 'failed';
   date: string;
   hash: string;
 }
@@ -67,9 +67,9 @@ interface CommunityApplication {
 }
 interface CommunityTransaction {
   id: string;
-  type: string;
+  type: 'deposit' | 'withdrawal' | 'payment';
   amount: number;
-  status: string;
+  status: 'pending' | 'completed' | 'failed';
   date: string;
   hash: string;
 }
@@ -420,12 +420,17 @@ const DashboardActionModal = ({
     if (action === 'deposit') {
       const handleDeposit = (e: React.FormEvent) => {
         e.preventDefault();
+        const amountNum = Number(amount);
+        if (isNaN(amountNum) || amountNum <= 0) {
+          setCreateError('Please enter a valid amount greater than 0.');
+          return;
+        }
         setTxLoading(true);
         setTimeout(() => {
           setTxHash(`0x${Math.random().toString(16).slice(2, 10)}...`);
           setTxSuccess(true);
           setTxLoading(false);
-          onDeposit(Number(amount));
+          onDeposit(amountNum);
         }, 1200);
       };
       return (
@@ -480,12 +485,21 @@ const DashboardActionModal = ({
     if (action === 'withdraw') {
       const handleWithdraw = (e: React.FormEvent) => {
         e.preventDefault();
+        const amountNum = Number(amount);
+        if (isNaN(amountNum) || amountNum <= 0) {
+          setCreateError('Please enter a valid amount greater than 0.');
+          return;
+        }
+        if (amountNum > brandDemo.balance) {
+          setCreateError('Amount cannot exceed available balance.');
+          return;
+        }
         setTxLoading(true);
         setTimeout(() => {
           setTxHash(`0x${Math.random().toString(16).slice(2, 10)}...`);
           setTxSuccess(true);
           setTxLoading(false);
-          onWithdraw(Number(amount));
+          onWithdraw(amountNum);
         }, 1200);
       };
       return (
@@ -696,12 +710,21 @@ const DashboardActionModal = ({
     if (action === 'withdraw') {
       const handleWithdraw = (e: React.FormEvent) => {
         e.preventDefault();
+        const amountNum = Number(amount);
+        if (isNaN(amountNum) || amountNum <= 0) {
+          setCreateError('Please enter a valid amount greater than 0.');
+          return;
+        }
+        if (amountNum > communityDemo.balance) {
+          setCreateError('Amount cannot exceed available balance.');
+          return;
+        }
         setTxLoading(true);
         setTimeout(() => {
           setTxHash(`0x${Math.random().toString(16).slice(2, 10)}...`);
           setTxSuccess(true);
           setTxLoading(false);
-          onWithdraw(Number(amount));
+          onWithdraw(amountNum);
         }, 1200);
       };
       return (

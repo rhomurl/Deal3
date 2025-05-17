@@ -1,5 +1,17 @@
 'use client';
 import { useState } from 'react';
+interface Applicant {
+  id: string;
+  name: string;
+  socials: {
+    twitter: string;
+    discord: string;
+    telegram: string;
+  };
+  status: 'Pending' | 'Approved' | 'Declined';
+  reason: string;
+  declineReason?: string;
+}
 interface EditCampaignModalProps {
   campaign: {
     id: string;
@@ -15,7 +27,7 @@ interface EditCampaignModalProps {
     endDate: string;
     successCriteria: string;
     expectedDeliverables: string;
-    applicantsList?: unknown[];
+    applicantsList: Applicant[];
   };
   onSave: (updated: {
     id: string;
@@ -31,7 +43,7 @@ interface EditCampaignModalProps {
     endDate: string;
     successCriteria: string;
     expectedDeliverables: string;
-    applicantsList?: unknown[];
+    applicantsList: Applicant[];
   }) => void;
   onClose: () => void;
 }

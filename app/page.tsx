@@ -46,9 +46,9 @@ interface Applicant {
 }
 interface BrandTransaction {
   id: string;
-  type: string;
+  type: 'deposit' | 'withdrawal' | 'payment';
   amount: number;
-  status: string;
+  status: 'pending' | 'completed' | 'failed';
   date: string;
   hash: string;
 }
@@ -73,9 +73,9 @@ interface CommunityApplication {
 }
 interface CommunityTransaction {
   id: string;
-  type: string;
+  type: 'deposit' | 'withdrawal' | 'payment';
   amount: number;
-  status: string;
+  status: 'pending' | 'completed' | 'failed';
   date: string;
   hash: string;
 }
@@ -346,7 +346,7 @@ export default function Home() {
       id: 'tx-1',
       type: 'deposit',
       amount: 2500,
-      status: 'Completed',
+      status: 'completed',
       date: '2025-05-13',
       hash: '0xabc123...',
     },
@@ -354,7 +354,7 @@ export default function Home() {
       id: 'tx-2',
       type: 'payment',
       amount: 500,
-      status: 'Completed',
+      status: 'completed',
       date: '2025-05-15',
       hash: '0xdef456...',
     },
@@ -406,7 +406,7 @@ export default function Home() {
       id: 'tx-1',
       type: 'withdrawal',
       amount: 200,
-      status: 'Completed',
+      status: 'completed',
       date: '2025-05-15', // Changed from 05-13 to 05-15
       hash: '0xaaa111...',
     },
@@ -414,7 +414,7 @@ export default function Home() {
       id: 'tx-2',
       type: 'payment',
       amount: 500,
-      status: 'Completed',
+      status: 'completed',
       date: '2025-05-13', // Changed from 05-15 to 05-13
       hash: '0xbbb222...',
     },
@@ -499,7 +499,7 @@ export default function Home() {
       id: `tx-${brandTransactions.length + 1}`,
       type: 'deposit',
       amount,
-      status: 'Completed',
+      status: 'completed',
       date: '2025-05-13',
       hash: `0x${Math.random().toString(16).slice(2, 10)}...`,
     };
@@ -513,7 +513,7 @@ export default function Home() {
       id: `tx-${brandTransactions.length + 1}`,
       type: 'withdrawal',
       amount,
-      status: 'Completed',
+      status: 'completed',
       date: '2025-05-13',
       hash: `0x${Math.random().toString(16).slice(2, 10)}...`,
     };
@@ -527,7 +527,7 @@ export default function Home() {
       id: `tx-${communityTransactions.length + 1}`,
       type: 'withdrawal',
       amount,
-      status: 'Completed',
+      status: 'completed',
       date: '2025-05-15', // Updated to match the date pattern
       hash: `0x${Math.random().toString(16).slice(2, 10)}...`,
     };
@@ -600,7 +600,11 @@ export default function Home() {
   // Edit Campaign
   const handleEditCampaignSave = (updated: BrandCampaign) => {
     setBrandCampaigns((prev) =>
-      prev.map((c) => (c.id === updated.id ? { ...c, ...updated } : c))
+      prev.map((c) =>
+        c.id === updated.id
+          ? { ...c, ...updated, applicantsList: updated.applicantsList ?? [] }
+          : c
+      )
     );
     setEditCampaignOpen(false);
     setCampaignToEdit(null);

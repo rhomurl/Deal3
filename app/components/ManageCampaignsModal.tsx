@@ -42,30 +42,28 @@ const ManageCampaignsModal: React.FC<ManageCampaignsModalProps> = ({
 }) => {
   const [viewApplicantsId, setViewApplicantsId] = useState<string | null>(null);
   const [declineReason, setDeclineReason] = useState<{ [appId: string]: string }>({});
-  const [error, setError] = useState<{ [appId: string]: string }>({});
+  const [declineError, setDeclineError] = useState<{ [appId: string]: string }>({});
   const handleApprove = (campaignId: string, appId: string) => {
     const campaign = campaigns.find((c) => c.id === campaignId);
     if (!campaign) return;
     const updated = campaign.applicantsList.map((a) =>
-      a.id === appId ? { ...a, status: 'Approved', declineReason: undefined } : a
+      a.id === appId ? { ...a, status: 'Approved' as const, declineReason: undefined } : a
     );
     onUpdateApplicants(campaignId, updated);
   };
   const handleDecline = (campaignId: string, appId: string) => {
     if (!declineReason[appId] || !declineReason[appId].trim()) {
-      setError((prev) => ({ ...prev, [appId]: 'Decline reason required.' }));
+      setDeclineError((prev) => ({ ...prev, [appId]: 'Please provide a reason for declining.' }));
       return;
     }
     const campaign = campaigns.find((c) => c.id === campaignId);
     if (!campaign) return;
     const updated = campaign.applicantsList.map((a) =>
-      a.id === appId
-        ? { ...a, status: 'Declined', declineReason: declineReason[appId] }
-        : a
+      a.id === appId ? { ...a, status: 'Declined' as const, declineReason: declineReason[appId] } : a
     );
     onUpdateApplicants(campaignId, updated);
-    setError((prev) => ({ ...prev, [appId]: '' }));
     setDeclineReason((prev) => ({ ...prev, [appId]: '' }));
+    setDeclineError((prev) => ({ ...prev, [appId]: '' }));
   };
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70">
@@ -207,8 +205,8 @@ const ManageCampaignsModal: React.FC<ManageCampaignsModalProps> = ({
                                   Decline
                                 </button>
                               </div>
-                              {error[app.id] && (
-                                <div className="text-xs text-red-400">{error[app.id]}</div>
+                              {declineError[app.id] && (
+                                <div className="text-xs text-red-400">{declineError[app.id]}</div>
                               )}
                             </div>
                           )}

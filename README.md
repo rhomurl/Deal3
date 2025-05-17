@@ -1,5 +1,7 @@
 # Deal3 - Web3 Community Campaign Platform
 
+> **Note:** This project is currently in the **Mockup phase**. All features and flows are for demonstration and prototyping purposes only. No real blockchain or authentication integrations are live yet.
+
 Deal3 is a modern web3 platform that connects brands with communities for direct, transparent campaign collaborations. Built on Base Network and powered by Privy authentication.
 
 ## Features
@@ -21,11 +23,11 @@ Deal3 is a modern web3 platform that connects brands with communities for direct
 
 ## Tech Stack
 
-- **Frontend**: Next.js with TypeScript
-- **Authentication**: Privy
-- **Network**: Base Network
-- **Styling**: Tailwind CSS
-- **State Management**: React Hooks
+- **Frontend:** Next.js (App Router) with TypeScript
+- **Authentication:** Privy
+- **Network:** Base Network
+- **Styling:** Tailwind CSS
+- **State Management:** React Hooks
 
 ## Getting Started
 
@@ -38,53 +40,56 @@ Deal3 is a modern web3 platform that connects brands with communities for direct
 
 ### Installation
 
-1. Clone the repository:
-```bash
-git clone https://github.com/yourusername/deal3.git
-cd deal3
-```
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/yourusername/deal3.git
+   cd deal3
+   ```
 
-2. Install dependencies:
-```bash
-npm install
-# or
-yarn install
-```
+2. **Install dependencies:**
+   ```bash
+   npm install
+   # or
+   yarn install
+   ```
 
-3. Set up environment variables:
-Create a `.env.local` file in the root directory and add your Privy API keys:
-```
-NEXT_PUBLIC_PRIVY_APP_ID=your_privy_app_id
-```
+3. **Set up environment variables:**
+   Create a `.env.local` file in the root directory and add your Privy API keys:
+   ```
+   NEXT_PUBLIC_PRIVY_APP_ID=your_privy_app_id
+   ```
 
-4. Run the development server:
-```bash
-npm run dev
-# or
-yarn dev
-```
+4. **Run the development server:**
+   ```bash
+   npm run dev
+   # or
+   yarn dev
+   ```
 
-5. Open [http://localhost:3000](http://localhost:3000) in your browser.
+5. **Open [http://localhost:3000](http://localhost:3000) in your browser.**
 
 ## Project Structure
 
 ```
 deal3/
-├── components/
-│   ├── AuthModal.tsx
-│   ├── DashboardActionModal.tsx
-│   ├── DashboardMock.tsx
-│   ├── EditCampaignModal.tsx
-│   ├── EditProfileModal.tsx
-│   ├── ManageCampaignsModal.tsx
-│   ├── MyCampaignsModal.tsx
-│   ├── ProfileSetupModal.tsx
-│   └── UserTypeModal.tsx
 ├── app/
+│   ├── components/
+│   │   ├── AuthModal.tsx
+│   │   ├── DashboardActionModal.tsx
+│   │   ├── DashboardMock.tsx
+│   │   ├── EditCampaignModal.tsx
+│   │   ├── EditProfileModal.tsx
+│   │   ├── ManageCampaignsModal.tsx
+│   │   ├── MyCampaignsModal.tsx
+│   │   ├── ProfileSetupModal.tsx
+│   │   └── UserTypeModal.tsx
 │   └── page.tsx
 ├── public/
 ├── styles/
-└── README.md
+├── tailwind.config.js
+├── postcss.config.js
+├── README.md
+└── ...
 ```
 
 ## Contributing
