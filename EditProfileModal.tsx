@@ -6,9 +6,18 @@ interface EditProfileModalProps {
     name: string;
     logo: string;
     description: string;
-    socials: string;
+    twitter: string;
+    discord: string;
+    telegram: string;
   };
-  onSave: (profile: { name: string; logo: string; description: string; socials: string }) => void;
+  onSave: (profile: {
+    name: string;
+    logo: string;
+    description: string;
+    twitter: string;
+    discord: string;
+    telegram: string;
+  }) => void;
   onClose: () => void;
 }
 const EditProfileModal: React.FC<EditProfileModalProps> = ({
@@ -20,7 +29,9 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
   const [name, setName] = useState<string>(profile.name);
   const [logo, setLogo] = useState<string>(profile.logo);
   const [description, setDescription] = useState<string>(profile.description);
-  const [socials, setSocials] = useState<string>(profile.socials);
+  const [twitter, setTwitter] = useState<string>(profile.twitter);
+  const [discord, setDiscord] = useState<string>(profile.discord);
+  const [telegram, setTelegram] = useState<string>(profile.telegram);
   const [error, setError] = useState<string>('');
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>): void => {
     e.preventDefault();
@@ -28,7 +39,7 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
       setError('Name is required.');
       return;
     }
-    onSave({ name, logo, description, socials });
+    onSave({ name, logo, description, twitter, discord, telegram });
   };
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70">
@@ -85,16 +96,42 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
             />
           </div>
           <div>
-            <label className="block text-white text-sm mb-1" htmlFor="socials">
-              Social Links
+            <label className="block text-white text-sm mb-1" htmlFor="twitter">
+              Twitter/X
             </label>
             <input
-              id="socials"
+              id="twitter"
               type="text"
               className="w-full px-3 py-2 rounded bg-[#23262b] text-white border border-[#23262b] focus:outline-none focus:border-[#0052ff]"
-              value={socials}
-              onChange={(e) => setSocials(e.target.value)}
-              placeholder="Twitter, Discord, etc."
+              value={twitter}
+              onChange={(e) => setTwitter(e.target.value)}
+              placeholder="@yourhandle"
+            />
+          </div>
+          <div>
+            <label className="block text-white text-sm mb-1" htmlFor="discord">
+              Discord
+            </label>
+            <input
+              id="discord"
+              type="text"
+              className="w-full px-3 py-2 rounded bg-[#23262b] text-white border border-[#23262b] focus:outline-none focus:border-[#0052ff]"
+              value={discord}
+              onChange={(e) => setDiscord(e.target.value)}
+              placeholder="discord.gg/yourserver"
+            />
+          </div>
+          <div>
+            <label className="block text-white text-sm mb-1" htmlFor="telegram">
+              Telegram
+            </label>
+            <input
+              id="telegram"
+              type="text"
+              className="w-full px-3 py-2 rounded bg-[#23262b] text-white border border-[#23262b] focus:outline-none focus:border-[#0052ff]"
+              value={telegram}
+              onChange={(e) => setTelegram(e.target.value)}
+              placeholder="@yourtelegram"
             />
           </div>
           {error && (

@@ -1,4 +1,3 @@
-
 'use client';
 import type { FC } from 'react';
 import type { DashboardAction } from './DashboardActionModal';
@@ -186,3 +185,4 @@ const DashboardMock: FC<DashboardMockProps> = ({
   );
 };
 export default DashboardMock;
+      

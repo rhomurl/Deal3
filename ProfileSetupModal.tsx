@@ -2,7 +2,14 @@
 import { useState } from 'react';
 interface ProfileSetupModalProps {
   userType: 'brand' | 'community';
-  onComplete: (profile: { name: string; logo: string; description: string; socials: string }) => void;
+  onComplete: (profile: {
+    name: string;
+    logo: string;
+    description: string;
+    twitter: string;
+    discord: string;
+    telegram: string;
+  }) => void;
   onClose: () => void;
 }
 const ProfileSetupModal: React.FC<ProfileSetupModalProps> = ({
@@ -13,7 +20,9 @@ const ProfileSetupModal: React.FC<ProfileSetupModalProps> = ({
   const [name, setName] = useState<string>('');
   const [logo, setLogo] = useState<string>('');
   const [description, setDescription] = useState<string>('');
-  const [socials, setSocials] = useState<string>('');
+  const [twitter, setTwitter] = useState<string>('');
+  const [discord, setDiscord] = useState<string>('');
+  const [telegram, setTelegram] = useState<string>('');
   const [error, setError] = useState<string>('');
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>): void => {
     e.preventDefault();
@@ -21,7 +30,7 @@ const ProfileSetupModal: React.FC<ProfileSetupModalProps> = ({
       setError('Name is required.');
       return;
     }
-    onComplete({ name, logo, description, socials });
+    onComplete({ name, logo, description, twitter, discord, telegram });
   };
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70">
@@ -83,16 +92,42 @@ const ProfileSetupModal: React.FC<ProfileSetupModalProps> = ({
             />
           </div>
           <div>
-            <label className="block text-white text-sm mb-1" htmlFor="socials">
-              Social Links
+            <label className="block text-white text-sm mb-1" htmlFor="twitter">
+              Twitter/X
             </label>
             <input
-              id="socials"
+              id="twitter"
               type="text"
               className="w-full px-3 py-2 rounded bg-[#23262b] text-white border border-[#23262b] focus:outline-none focus:border-[#0052ff]"
-              value={socials}
-              onChange={(e) => setSocials(e.target.value)}
-              placeholder="Twitter, Discord, etc."
+              value={twitter}
+              onChange={(e) => setTwitter(e.target.value)}
+              placeholder="@yourhandle"
+            />
+          </div>
+          <div>
+            <label className="block text-white text-sm mb-1" htmlFor="discord">
+              Discord
+            </label>
+            <input
+              id="discord"
+              type="text"
+              className="w-full px-3 py-2 rounded bg-[#23262b] text-white border border-[#23262b] focus:outline-none focus:border-[#0052ff]"
+              value={discord}
+              onChange={(e) => setDiscord(e.target.value)}
+              placeholder="discord.gg/yourserver"
+            />
+          </div>
+          <div>
+            <label className="block text-white text-sm mb-1" htmlFor="telegram">
+              Telegram
+            </label>
+            <input
+              id="telegram"
+              type="text"
+              className="w-full px-3 py-2 rounded bg-[#23262b] text-white border border-[#23262b] focus:outline-none focus:border-[#0052ff]"
+              value={telegram}
+              onChange={(e) => setTelegram(e.target.value)}
+              placeholder="@yourtelegram"
             />
           </div>
           {error && (

@@ -12,7 +12,9 @@ interface UserProfile {
   name: string;
   logo: string;
   description: string;
-  socials: string;
+  twitter: string;
+  discord: string;
+  telegram: string;
 }
 interface BrandCampaign {
   id: string;
@@ -23,6 +25,24 @@ interface BrandCampaign {
   status: string;
   applicants: number;
   approved: number;
+  numCommunities: number;
+  startDate: string;
+  endDate: string;
+  successCriteria: string;
+  expectedDeliverables: string;
+  applicantsList: Applicant[];
+}
+interface Applicant {
+  id: string;
+  name: string;
+  socials: {
+    twitter: string;
+    discord: string;
+    telegram: string;
+  };
+  status: 'Pending' | 'Approved' | 'Declined';
+  reason: string;
+  declineReason?: string;
 }
 interface BrandTransaction {
   id: string;
@@ -38,12 +58,18 @@ interface CommunityCampaign {
   brand: string;
   status: string;
   deliverableDue: string;
+  successCriteria: string;
+  expectedDeliverables: string;
+  declineReason?: string;
 }
 interface CommunityApplication {
   id: string;
+  campaignId: string;
   campaign: string;
   status: string;
   appliedOn: string;
+  reason: string;
+  declineReason?: string;
 }
 interface CommunityTransaction {
   id: string;
@@ -53,6 +79,73 @@ interface CommunityTransaction {
   date: string;
   hash: string;
 }
+const INITIAL_DISCOVERABLE_CAMPAIGNS = [
+  {
+    id: 'cmp-3',
+    title: 'GameFi Growth Sprint',
+    brand: 'PlayVerse',
+    status: 'Open',
+    deliverableDue: '2025-07-01',
+    numCommunities: 5,
+    startDate: '2025-06-15',
+    endDate: '2025-07-15',
+    successCriteria: '2000 new GameFi users, 500+ game sessions.',
+    expectedDeliverables: 'Gameplay videos, user stats, event summary.',
+    budgetPerCommunity: '$300 - $800',
+  },
+  {
+    id: 'cmp-4',
+    title: 'DAO Awareness Drive',
+    brand: 'GovDAO',
+    status: 'Open',
+    deliverableDue: '2025-07-10',
+    numCommunities: 8,
+    startDate: '2025-06-20',
+    endDate: '2025-07-20',
+    successCriteria: '1000 DAO signups, 10+ governance proposals.',
+    expectedDeliverables: 'Proposal writeups, onboarding guides.',
+    budgetPerCommunity: '$500 - $1200',
+  },
+  {
+    id: 'cmp-5',
+    title: 'SocialFi Viral Challenge',
+    brand: 'SocialX',
+    status: 'Open',
+    deliverableDue: '2025-07-25',
+    numCommunities: 7,
+    startDate: '2025-07-01',
+    endDate: '2025-07-31',
+    successCriteria: '5000+ SocialFi signups, 100 viral posts.',
+    expectedDeliverables: 'Social media posts, campaign analytics.',
+    budgetPerCommunity: '$400 - $1000',
+  },
+  {
+    id: 'cmp-6',
+    title: 'Metaverse Meetup',
+    brand: 'MetaWorld',
+    status: 'Open',
+    deliverableDue: '2025-08-10',
+    numCommunities: 4,
+    startDate: '2025-07-20',
+    endDate: '2025-08-10',
+    successCriteria: '1000 metaverse event attendees.',
+    expectedDeliverables: 'Event summary, attendee list, media coverage.',
+    budgetPerCommunity: '$600 - $1500',
+  },
+  {
+    id: 'cmp-7',
+    title: 'Layer2 Education Drive',
+    brand: 'L2Learn',
+    status: 'Open',
+    deliverableDue: '2025-08-20',
+    numCommunities: 6,
+    startDate: '2025-08-01',
+    endDate: '2025-08-20',
+    successCriteria: '2000 new L2 wallet users, 10+ educational sessions.',
+    expectedDeliverables: 'Session recordings, onboarding stats.',
+    budgetPerCommunity: '$350 - $900',
+  },
+];
 export default function Home() {
   const [authOpen, setAuthOpen] = useState<boolean>(false);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
@@ -65,13 +158,85 @@ export default function Home() {
     name: '',
     logo: '',
     description: '',
-    socials: '',
+    twitter: '',
+    discord: '',
+    telegram: '',
   });
   const [dashboardOpen, setDashboardOpen] = useState<boolean>(false);
   const [dashboardAction, setDashboardAction] = useState<DashboardAction | null>(null);
-  // Edit Campaign modal state
   const [editCampaignOpen, setEditCampaignOpen] = useState<boolean>(false);
   const [campaignToEdit, setCampaignToEdit] = useState<BrandCampaign | null>(null);
+  // Dummy applicants for campaigns
+  const dummyApplicants: Applicant[] = [
+    {
+      id: 'app-1',
+      name: 'Web3 United',
+      socials: {
+        twitter: '@web3united',
+        discord: 'discord.gg/web3united',
+        telegram: '@web3united',
+      },
+      status: 'Approved',
+      reason: 'We have a strong NFT audience and can deliver high engagement.',
+    },
+    {
+      id: 'app-2',
+      name: 'DAO Pioneers',
+      socials: {
+        twitter: '@daopioneers',
+        discord: 'discord.gg/daopioneers',
+        telegram: '@daopioneers',
+      },
+      status: 'Pending',
+      reason: 'Our DAO is looking to expand into NFTs and can help with onboarding.',
+    },
+    {
+      id: 'app-3',
+      name: 'GameFi Guild',
+      socials: {
+        twitter: '@gamefiguild',
+        discord: 'discord.gg/gamefiguild',
+        telegram: '@gamefiguild',
+      },
+      status: 'Declined',
+      reason: 'We have a large gaming community.',
+      declineReason: 'Not a fit for this campaign at this time.',
+    },
+    {
+      id: 'app-4',
+      name: 'DeFi Champs',
+      socials: {
+        twitter: '@defichamps',
+        discord: 'discord.gg/defichamps',
+        telegram: '@defichamps',
+      },
+      status: 'Approved',
+      reason: 'We can drive DeFi user signups.',
+    },
+    {
+      id: 'app-5',
+      name: 'NFT Ninjas',
+      socials: {
+        twitter: '@nftninjas',
+        discord: 'discord.gg/nftninjas',
+        telegram: '@nftninjas',
+      },
+      status: 'Pending',
+      reason: 'We have a passionate NFT collector base.',
+    },
+    {
+      id: 'app-6',
+      name: 'Yield Farmers',
+      socials: {
+        twitter: '@yieldfarmers',
+        discord: 'discord.gg/yieldfarmers',
+        telegram: '@yieldfarmers',
+      },
+      status: 'Declined',
+      reason: 'We focus on DeFi education.',
+      declineReason: 'Looking for NFT-focused communities.',
+    },
+  ];
   // Demo/mock data for brands and communities (stateful for interactivity)
   const [brandCampaigns, setBrandCampaigns] = useState<BrandCampaign[]>([
     {
@@ -81,8 +246,14 @@ export default function Home() {
       budget: 1500,
       tags: ['NFT', 'Art'],
       status: 'Active',
-      applicants: 8,
-      approved: 3,
+      applicants: 6,
+      approved: 2,
+      numCommunities: 10,
+      startDate: '2025-06-01',
+      endDate: '2025-06-30',
+      successCriteria: 'Onboard 500 new users, 1000+ NFT mints.',
+      expectedDeliverables: 'Social posts, campaign report, mint analytics.',
+      applicantsList: dummyApplicants,
     },
     {
       id: 'cmp-2',
@@ -91,8 +262,83 @@ export default function Home() {
       budget: 2000,
       tags: ['DeFi', 'Onboarding'],
       status: 'Completed',
-      applicants: 12,
-      approved: 5,
+      applicants: 6,
+      approved: 3,
+      numCommunities: 8,
+      startDate: '2025-05-01',
+      endDate: '2025-05-31',
+      successCriteria: '1000 new DeFi wallets, 500+ protocol interactions.',
+      expectedDeliverables: 'Tutorials, AMAs, onboarding stats.',
+      applicantsList: [
+        {
+          id: 'app-7',
+          name: 'DeFi Champs',
+          socials: {
+            twitter: '@defichamps',
+            discord: 'discord.gg/defichamps',
+            telegram: '@defichamps',
+          },
+          status: 'Approved',
+          reason: 'We can drive DeFi user signups.',
+        },
+        {
+          id: 'app-8',
+          name: 'Yield Farmers',
+          socials: {
+            twitter: '@yieldfarmers',
+            discord: 'discord.gg/yieldfarmers',
+            telegram: '@yieldfarmers',
+          },
+          status: 'Approved',
+          reason: 'We focus on DeFi education.',
+        },
+        {
+          id: 'app-9',
+          name: 'DAO Pioneers',
+          socials: {
+            twitter: '@daopioneers',
+            discord: 'discord.gg/daopioneers',
+            telegram: '@daopioneers',
+          },
+          status: 'Pending',
+          reason: 'Our DAO is looking to expand into DeFi.',
+        },
+        {
+          id: 'app-10',
+          name: 'NFT Ninjas',
+          socials: {
+            twitter: '@nftninjas',
+            discord: 'discord.gg/nftninjas',
+            telegram: '@nftninjas',
+          },
+          status: 'Declined',
+          reason: 'We have a passionate NFT collector base.',
+          declineReason: 'Looking for DeFi-focused communities.',
+        },
+        {
+          id: 'app-11',
+          name: 'Web3 United',
+          socials: {
+            twitter: '@web3united',
+            discord: 'discord.gg/web3united',
+            telegram: '@web3united',
+          },
+          status: 'Pending',
+          reason: 'We have a strong DeFi audience.',
+        },
+        {
+          id: 'app-12',
+          name: 'GameFi Guild',
+          socials: {
+            twitter: '@gamefiguild',
+            discord: 'discord.gg/gamefiguild',
+            telegram: '@gamefiguild',
+          },
+          status: 'Declined',
+          reason: 'We have a large gaming community.',
+          declineReason: 'Not a fit for this campaign at this time.',
+        },
+      ],
     },
   ]);
   const [brandTransactions, setBrandTransactions] = useState<BrandTransaction[]>([
@@ -114,6 +360,7 @@ export default function Home() {
     },
   ]);
   const [brandBalance, setBrandBalance] = useState<number>(2000);
+  // Community state
   const [communityCampaigns, setCommunityCampaigns] = useState<CommunityCampaign[]>([
     {
       id: 'cmp-1',
@@ -121,48 +368,60 @@ export default function Home() {
       brand: 'BlueChip Studios',
       status: 'Active',
       deliverableDue: '2025-06-20',
+      successCriteria: 'Onboard 500 new users, 1000+ NFT mints.',
+      expectedDeliverables: 'Social posts, campaign report, mint analytics.',
     },
     {
       id: 'cmp-2',
       title: 'DeFi Onboarding Blitz',
       brand: 'Yieldly',
-      status: 'Completed',
+      status: 'Declined',
       deliverableDue: '2025-05-15',
+      successCriteria: '1000 new DeFi wallets, 500+ protocol interactions.',
+      expectedDeliverables: 'Tutorials, AMAs, onboarding stats.',
+      declineReason: 'Looking for DeFi-focused communities.',
     },
   ]);
   const [communityApplications, setCommunityApplications] = useState<CommunityApplication[]>([
     {
       id: 'app-1',
+      campaignId: 'cmp-1',
       campaign: 'NFT Summer Launch',
       status: 'Approved',
       appliedOn: '2025-05-14',
+      reason: 'We have a strong NFT audience and can deliver high engagement.',
     },
     {
       id: 'app-2',
+      campaignId: 'cmp-2',
       campaign: 'DeFi Onboarding Blitz',
-      status: 'Completed',
+      status: 'Declined',
       appliedOn: '2025-05-01',
+      reason: 'We have a passionate NFT collector base.',
+      declineReason: 'Looking for DeFi-focused communities.',
     },
   ]);
   const [communityTransactions, setCommunityTransactions] = useState<CommunityTransaction[]>([
     {
       id: 'tx-1',
       type: 'withdrawal',
-      amount: 300,
+      amount: 200,
       status: 'Completed',
-      date: '2025-05-13',
+      date: '2025-05-15', // Changed from 05-13 to 05-15
       hash: '0xaaa111...',
     },
     {
       id: 'tx-2',
       type: 'payment',
-      amount: 200,
+      amount: 500,
       status: 'Completed',
-      date: '2025-05-15',
+      date: '2025-05-13', // Changed from 05-15 to 05-13
       hash: '0xbbb222...',
     },
   ]);
-  const [communityBalance, setCommunityBalance] = useState<number>(500);
+  const [communityBalance, setCommunityBalance] = useState<number>(300);
+  // Community: Discoverable campaigns (now in state)
+  const [discoverableCampaigns, setDiscoverableCampaigns] = useState(INITIAL_DISCOVERABLE_CAMPAIGNS);
   // Simulate Privy login
   const handleAuthSuccess = (): void => {
     setIsAuthenticated(true);
@@ -188,7 +447,9 @@ export default function Home() {
       name: '',
       logo: '',
       description: '',
-      socials: '',
+      twitter: '',
+      discord: '',
+      telegram: '',
     });
     setDashboardOpen(false);
     setDashboardAction(null);
@@ -201,7 +462,17 @@ export default function Home() {
     setDashboardAction(null);
   };
   // Brand: Create Campaign
-  const handleCreateCampaign = (title: string, description: string, budget: number, tags: string[]): void => {
+  const handleCreateCampaign = (
+    title: string,
+    description: string,
+    budget: number,
+    tags: string[],
+    numCommunities: number,
+    startDate: string,
+    endDate: string,
+    successCriteria: string,
+    expectedDeliverables: string
+  ): void => {
     const newId = `cmp-${brandCampaigns.length + 1}`;
     const newCampaign: BrandCampaign = {
       id: newId,
@@ -212,6 +483,12 @@ export default function Home() {
       status: 'Active',
       applicants: 0,
       approved: 0,
+      numCommunities,
+      startDate,
+      endDate,
+      successCriteria,
+      expectedDeliverables,
+      applicantsList: [],
     };
     setBrandCampaigns([newCampaign, ...brandCampaigns]);
     setDashboardAction('manage-campaigns');
@@ -230,6 +507,20 @@ export default function Home() {
     setBrandBalance(brandBalance + amount);
     setDashboardAction('transactions');
   };
+  // Brand: Withdraw Funds
+  const handleBrandWithdraw = (amount: number): void => {
+    const newTx: BrandTransaction = {
+      id: `tx-${brandTransactions.length + 1}`,
+      type: 'withdrawal',
+      amount,
+      status: 'Completed',
+      date: '2025-05-13',
+      hash: `0x${Math.random().toString(16).slice(2, 10)}...`,
+    };
+    setBrandTransactions([newTx, ...brandTransactions]);
+    setBrandBalance(brandBalance - amount);
+    setDashboardAction('transactions');
+  };
   // Community: Withdraw Funds
   const handleWithdraw = (amount: number): void => {
     const newTx: CommunityTransaction = {
@@ -237,55 +528,49 @@ export default function Home() {
       type: 'withdrawal',
       amount,
       status: 'Completed',
-      date: '2025-05-13',
+      date: '2025-05-15', // Updated to match the date pattern
       hash: `0x${Math.random().toString(16).slice(2, 10)}...`,
     };
     setCommunityTransactions([newTx, ...communityTransactions]);
     setCommunityBalance(communityBalance - amount);
     setDashboardAction('transactions');
   };
-  // Community: Accept Campaign
-  const handleAcceptCampaign = (campaignId: string): void => {
+  // Community: Accept Campaign (apply)
+  const handleAcceptCampaign = (campaignId: string, reason: string): void => {
+    // Find campaign in discoverable
     const campaign = discoverableCampaigns.find((c) => c.id === campaignId);
     if (!campaign) return;
+    // Remove from discoverable
+    setDiscoverableCampaigns((prev) => prev.filter((c) => c.id !== campaignId));
+    // Add to applications as Pending
+    setCommunityApplications([
+      {
+        id: `app-${communityApplications.length + 1}`,
+        campaignId: campaign.id,
+        campaign: campaign.title,
+        status: 'Pending',
+        appliedOn: '2025-05-13',
+        reason,
+      },
+      ...communityApplications,
+    ]);
+    // Add to My Campaigns as Pending
     setCommunityCampaigns([
       {
         id: campaign.id,
         title: campaign.title,
         brand: campaign.brand,
-        status: 'Active',
+        status: 'Pending',
         deliverableDue: campaign.deliverableDue,
+        successCriteria: campaign.successCriteria,
+        expectedDeliverables: campaign.expectedDeliverables,
       },
       ...communityCampaigns,
     ]);
-    setCommunityApplications([
-      {
-        id: `app-${communityApplications.length + 1}`,
-        campaign: campaign.title,
-        status: 'Approved',
-        appliedOn: '2025-05-13',
-      },
-      ...communityApplications,
-    ]);
     setDashboardAction('my-campaigns');
   };
-  // Demo discoverable campaigns for community (not yet accepted)
-  const discoverableCampaigns: CommunityCampaign[] = [
-    {
-      id: 'cmp-3',
-      title: 'GameFi Growth Sprint',
-      brand: 'PlayVerse',
-      status: 'Open',
-      deliverableDue: '2025-07-01',
-    },
-    {
-      id: 'cmp-4',
-      title: 'DAO Awareness Drive',
-      brand: 'GovDAO',
-      status: 'Open',
-      deliverableDue: '2025-07-10',
-    },
-  ];
+  // Community: Only show discoverable campaigns not already applied to
+  const appliedCampaignIds = new Set(communityApplications.map((a) => a.campaignId));
   // Brand/Community demo objects for modal props
   const brandDemo = {
     campaigns: brandCampaigns,
@@ -295,13 +580,14 @@ export default function Home() {
       setCampaignToEdit(campaign);
       setEditCampaignOpen(true);
     },
+    onWithdraw: handleBrandWithdraw,
   };
   const communityDemo = {
     campaigns: communityCampaigns,
     applications: communityApplications,
     transactions: communityTransactions,
     balance: communityBalance,
-    discoverable: discoverableCampaigns,
+    discoverable: discoverableCampaigns.filter((c) => !appliedCampaignIds.has(c.id)),
   };
   // Edit Profile
   const handleEditProfile = () => {
@@ -374,7 +660,19 @@ export default function Home() {
       {dashboardOpen && userType && (
         <DashboardMock
           userType={userType}
-          profile={profile}
+          profile={{
+            userType: profile.userType,
+            name: profile.name,
+            logo: profile.logo,
+            description: profile.description,
+            socials: [
+              profile.twitter && `Twitter/X: ${profile.twitter}`,
+              profile.discord && `Discord: ${profile.discord}`,
+              profile.telegram && `Telegram: ${profile.telegram}`,
+            ]
+              .filter(Boolean)
+              .join(' | '),
+          }}
           onLogout={handleLogout}
           onAction={handleDashboardAction}
           onEditProfile={handleEditProfile}
@@ -390,7 +688,7 @@ export default function Home() {
           communityDemo={communityDemo}
           onCreateCampaign={handleCreateCampaign}
           onDeposit={handleDeposit}
-          onWithdraw={handleWithdraw}
+          onWithdraw={userType === 'brand' ? handleBrandWithdraw : handleWithdraw}
           onAcceptCampaign={handleAcceptCampaign}
         />
       )}
@@ -417,4 +715,3 @@ export default function Home() {
     </main>
   );
 }
-      
