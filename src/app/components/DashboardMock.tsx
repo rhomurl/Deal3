@@ -185,4 +185,3 @@ const DashboardMock: FC<DashboardMockProps> = ({
   );
 };
 export default DashboardMock;
-      

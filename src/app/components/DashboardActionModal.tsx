@@ -1,7 +1,7 @@
 'use client';
 import { useState } from 'react';
-import ManageCampaignsModal from './ManageCampaignsModal';
-import MyCampaignsModal from './MyCampaignsModal';
+import ManageCampaignsModal from '../ManageCampaignsModal';
+import MyCampaignsModal from '../MyCampaignsModal';
 export type DashboardAction =
   | 'create-campaign'
   | 'manage-campaigns'
